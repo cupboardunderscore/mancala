@@ -92,7 +92,7 @@ Widget::Widget(QWidget *parent)
         usern.hide();
         sinn = true;
         frenname = "player 2";
-        playgame2();
+        playthedamngame();
     });
     QObject::connect(&mulb, &QPushButton::clicked, [&]()
     {
@@ -683,7 +683,7 @@ void Widget::timer(int delay)
 void Widget::playthedamngame()
 {
     dibu();
-    if (mmmm == true)
+    if (mmmm == true || sinn == true)
     {
         enbu();
     }
@@ -692,7 +692,14 @@ void Widget::playthedamngame()
     QString tempwinsfrf;
     tempwinsfrf.setNum(winsfren);
     mn.setText(myname + " (" + tempwins + ")");
-    fn.setText(frenname + " (" + tempwinsfrf + ")");
+    if (sinn == false)
+    {
+        fn.setText(frenname + " (" + tempwinsfrf + ")");
+    }
+    else
+    {
+        fn.setText(frenname);
+    }
     abowl.setText("0");
     bbowl.setText("0");
     aas.push_back(&a5);
@@ -718,59 +725,21 @@ void Widget::playthedamngame()
         left.addWidget(i,Qt::AlignCenter,Qt::AlignCenter);
         i->setText("4");
     }
-    for (auto i : bbs)
+    if (sinn == false)
     {
-        right.addWidget(i,Qt::AlignCenter,Qt::AlignCenter);
-        i->setText("4");
+        for (auto i : bbs)
+        {
+            right.addWidget(i,Qt::AlignCenter,Qt::AlignCenter);
+            i->setText("4");
+        }
     }
-    mancaladis.addLayout(&left);
-    mancaladis.addLayout(&right);
-    nameese.addWidget(&mn,Qt::AlignCenter,Qt::AlignCenter);
-    nameese.addWidget(&fn,Qt::AlignCenter,Qt::AlignCenter);
-    mancccc.addLayout(&nameese,Qt::AlignCenter);
-    mancccc.addWidget(&bbowl,Qt::AlignCenter,Qt::AlignCenter);
-    mancccc.addLayout(&mancaladis,Qt::AlignCenter);
-    mancccc.addWidget(&abowl,Qt::AlignCenter,Qt::AlignCenter);
-    mancccc.addWidget(&tirn);
-    mainpage.addLayout(&mancccc);
-}
-
-void Widget::playgame2()
-{
-    enbu();
-    QString tempwins;
-    tempwins.setNum(wins);
-    mn.setText(myname + " (" + tempwins + ")");
-    fn.setText(frenname);
-    abowl.setText("0");
-    bbowl.setText("0");
-    aas.push_back(&a5);
-    aas.push_back(&a4);
-    aas.push_back(&a3);
-    aas.push_back(&a2);
-    aas.push_back(&a1);
-    aas.push_back(&a0);
-    bbs.push_back(&b0);
-    bbs.push_back(&b1);
-    bbs.push_back(&b2);
-    bbs.push_back(&b3);
-    bbs.push_back(&b4);
-    bbs.push_back(&b5);
-    bss.push_back(&bs0);
-    bss.push_back(&bs1);
-    bss.push_back(&bs2);
-    bss.push_back(&bs3);
-    bss.push_back(&bs4);
-    bss.push_back(&bs5);
-    for (auto i : aas)
+    else
     {
-        left.addWidget(i,Qt::AlignCenter,Qt::AlignCenter);
-        i->setText("4");
-    }
-    for (auto i : bss)
-    {
-        right.addWidget(i,Qt::AlignCenter,Qt::AlignCenter);
-        i->setText("4");
+        for (auto i : bss)
+        {
+            right.addWidget(i,Qt::AlignCenter,Qt::AlignCenter);
+            i->setText("4");
+        }
     }
     mancaladis.addLayout(&left);
     mancaladis.addLayout(&right);
@@ -786,25 +755,19 @@ void Widget::playgame2()
 
 void Widget::enbu()
 {
+    a0.setEnabled(true);
+    a1.setEnabled(true);
+    a2.setEnabled(true);
+    a3.setEnabled(true);
+    a4.setEnabled(true);
+    a5.setEnabled(true);
     if (sinn == false)
     {
         tirn.setText("your turn. c:");
-        a0.setEnabled(true);
-        a1.setEnabled(true);
-        a2.setEnabled(true);
-        a3.setEnabled(true);
-        a4.setEnabled(true);
-        a5.setEnabled(true);
     }
     else
     {
         tirn.setText(myname + "'s turn. c:");
-        a0.setEnabled(true);
-        a1.setEnabled(true);
-        a2.setEnabled(true);
-        a3.setEnabled(true);
-        a4.setEnabled(true);
-        a5.setEnabled(true);
         bs0.setEnabled(false);
         bs1.setEnabled(false);
         bs2.setEnabled(false);
@@ -816,25 +779,19 @@ void Widget::enbu()
 
 void Widget::dibu()
 {
+    a0.setEnabled(false);
+    a1.setEnabled(false);
+    a2.setEnabled(false);
+    a3.setEnabled(false);
+    a4.setEnabled(false);
+    a5.setEnabled(false);
     if (sinn == false)
     {
         tirn.setText("wait for " + frenname + " to make their turn. c:");
-        a0.setEnabled(false);
-        a1.setEnabled(false);
-        a2.setEnabled(false);
-        a3.setEnabled(false);
-        a4.setEnabled(false);
-        a5.setEnabled(false);
     }
     else
     {
         tirn.setText("player 2's turn. c:");
-        a0.setEnabled(false);
-        a1.setEnabled(false);
-        a2.setEnabled(false);
-        a3.setEnabled(false);
-        a4.setEnabled(false);
-        a5.setEnabled(false);
         bs0.setEnabled(true);
         bs1.setEnabled(true);
         bs2.setEnabled(true);
@@ -876,8 +833,7 @@ void Widget::changen()
     }
     settings.open(QIODevice::ReadWrite | QIODevice::Truncate);
     QTextStream txtStream(&settings);
-    txtStream << myname;
-    txtStream << "\n" << tempwins << "\nplsdonotchange:3";
+    txtStream << myname << "\n" << tempwins << "\nplsdonotchange:3";
     settings.close();
     if (wins == 0)
     {
@@ -902,8 +858,7 @@ void Widget::win()
     tempwins.setNum(wins);
     settings.open(QIODevice::ReadWrite | QIODevice::Truncate);
     QTextStream txtStream(&settings);
-    txtStream << myname;
-    txtStream << "\n" << tempwins << "\nplsdonotchange:3";
+    txtStream << myname << "\n" << tempwins << "\nplsdonotchange:3";
     settings.close();
     mn.setText(myname + " (" + tempwins + ")");
     if (wins == 1)
@@ -965,8 +920,7 @@ void Widget::bothwin()
     tempwins.setNum(wins);
     settings.open(QIODevice::ReadWrite | QIODevice::Truncate);
     QTextStream txtStream(&settings);
-    txtStream << myname;
-    txtStream << "\n" << tempwins << "\nplsdonotchange:3";
+    txtStream << myname << "\n" << tempwins << "\nplsdonotchange:3";
     settings.close();
     mn.setText(myname + " (" + tempwins + ")");
     if (wins == 1)

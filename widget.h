@@ -26,7 +26,7 @@ class Widget : public QWidget
     QStringList fila = QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation);
     QString setpath;
     QString myname;
-    int wins;
+    int wins, winsfren;
     QPushButton changename, rules, sinb, mulb, host, conn;
     QLabel name, usern, ipwait;
     QVBoxLayout mainpage;

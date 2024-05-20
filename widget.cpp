@@ -13,9 +13,26 @@ Widget::Widget(QWidget *parent)
     QFile settings(setpath + "/settings");
     if (!settings.exists())
     {
+        bool semi = true;
         QStringList tempo = QHostInfo::localHostName().split('.');
         QStringList tempoo = tempo[0].split('-');
-        myname = QInputDialog::getText(this, "mancala.", "choose your name", QLineEdit::Normal, tempoo[0]);
+        while (semi == true)
+        {
+            myname = QInputDialog::getText(this, "mancala.", "choose your name", QLineEdit::Normal, tempoo[0]);
+            semi = false;
+            if (myname.size() == 0)
+            {
+                semi = true;
+            }
+            for (auto i : myname)
+            {
+                if (i == ';')
+                {
+                    semi = true;
+                    break;
+                }
+            }
+        }
         settings.open(QIODevice::ReadWrite);
         QTextStream txtStream(&settings);
         txtStream << myname;
@@ -477,7 +494,17 @@ void Widget::hostgame()
             socket.readDatagram(datagram.data(), datagram.size(), &address, &port);
             QHostAddress tempipp(address.toIPv4Address());
             frenip = tempipp.toString();
-            frenname = datagram.data();
+            QString tempfren = datagram.data();
+            QStringList tempfnre = tempfren.split(';');
+            frenname = tempfnre[0];
+            if (tempfnre.size() > 1)
+            {
+                winsfren = tempfnre[1].toInt();
+            }
+            else
+            {
+                winsfren = -1;
+            }
             socket.close();
             ipwait.setText(frenname + " connected with ip: " + frenip);
             qDebug() << datagram.data() << tempipp;
@@ -491,7 +518,7 @@ void Widget::host2()
 {
     QString tempwins;
     tempwins.setNum(wins);
-    tempwins = myname + " (" + tempwins + ")";
+    tempwins = myname + ";" + tempwins;
     QHostAddress frenaddress(frenip);
     QByteArray datagram2 = tempwins.toUtf8();
     timer(1000);
@@ -551,7 +578,7 @@ void Widget::conngame()
     frenip = QInputDialog::getText(this, "mancala.", "enter host ip:");
     QString tempwins;
     tempwins.setNum(wins);
-    tempwins = myname + " (" + tempwins + ")";
+    tempwins = myname + ";" + tempwins;
     QHostAddress frenaddress(frenip);
     QByteArray datagram2 = tempwins.toUtf8();
     socket.writeDatagram(datagram2.data(), datagram2.size(), frenaddress, 55555);
@@ -571,7 +598,17 @@ void Widget::conngame()
             QHostAddress tempipp(address.toIPv4Address());
             if (tempipp.toString() == frenip)
             {
-                frenname = datagram.data();
+                QString tempfren = datagram.data();
+                QStringList tempfnre = tempfren.split(';');
+                frenname = tempfnre[0];
+                if (tempfnre.size() > 1)
+                {
+                    winsfren = tempfnre[1].toInt();
+                }
+                else
+                {
+                    winsfren = -1;
+                }
                 socket2.close();
                 ipwait.setText(frenname + " connected with ip: " + frenip);
                 mainpage.addWidget(&ipwait);
@@ -655,8 +692,10 @@ void Widget::playthedamngame()
     }
     QString tempwins;
     tempwins.setNum(wins);
+    QString tempwinsfrf;
+    tempwinsfrf.setNum(winsfren);
     mn.setText(myname + " (" + tempwins + ")");
-    fn.setText(frenname);
+    fn.setText(frenname + " (" + tempwinsfrf + ")");
     abowl.setText("0");
     bbowl.setText("0");
     aas.push_back(&a5);
@@ -782,9 +821,7 @@ void Widget::dibu()
 {
     if (sinn == false)
     {
-        QStringList tempften = frenname.split('(');
-        tempften[0].resize(tempften[0].size()-1);
-        tirn.setText("wait for " + tempften[0] + " to make their turn. c:");
+        tirn.setText("wait for " + frenname + " to make their turn. c:");
         a0.setEnabled(false);
         a1.setEnabled(false);
         a2.setEnabled(false);
@@ -812,12 +849,29 @@ void Widget::dibu()
 
 void Widget::changen()
 {
+    bool semi = true;
     QFile settings(setpath + "/settings");
     QString tempwins;
     tempwins.setNum(wins);
     QStringList tempo = QHostInfo::localHostName().split('.');
     QStringList tempoo = tempo[0].split('-');
-    myname = QInputDialog::getText(this, "mancala.", "choose your name", QLineEdit::Normal, tempoo[0]);
+    while (semi == true)
+    {
+        myname = QInputDialog::getText(this, "mancala.", "choose your name", QLineEdit::Normal, tempoo[0]);
+        semi = false;
+        if (myname.size() == 0)
+        {
+            semi = true;
+        }
+        for (auto i : myname)
+        {
+            if (i == ';')
+            {
+                semi = true;
+                break;
+            }
+        }
+    }
     settings.open(QIODevice::ReadWrite | QIODevice::Truncate);
     QTextStream txtStream(&settings);
     txtStream << myname;
@@ -885,13 +939,10 @@ void Widget::nowin()
     dibu();
     if (sinn == false)
     {
-        QStringList frwinz = frenname.split('(');
-        QStringList frwinzs = frwinz[1].split(')');
-        int frwins = frwinzs[0].toInt();
-        QString frwitemp;
-        frwitemp.setNum(frwins + 1);
-        frenname = frwinz[0] + "(" + frwitemp + ")";
-        fn.setText(frenname);
+        winsfren = winsfren + 1;
+        QString tempwinsfrf;
+        tempwinsfrf.setNum(winsfren);
+        fn.setText(frenname + " (" + tempwinsfrf + ")");
         tirn.setText("you didn't win, maybe next time c:");
     }
     else
@@ -935,14 +986,10 @@ void Widget::bothwin()
     if (sinn == false)
     {
         tirn.setText("you both won! you have " + tempwins);
-        QStringList frwinz = frenname.split('(');
-        QStringList frwinzs = frwinz[1].split(')');
-        int frwins = frwinzs[0].toInt();
-        QString frwitemp;
-        frwitemp.setNum(frwins + 1);
-        frenname = frwinz[0] + "(" + frwitemp + ")";
-        fn.setText(frenname);
-        tirn.setText("you didn't win, maybe next time c:");
+        winsfren = winsfren + 1;
+        QString tempwinsfrf;
+        tempwinsfrf.setNum(winsfren);
+        fn.setText(frenname + " (" + tempwinsfrf + ")");
     }
     else
     {

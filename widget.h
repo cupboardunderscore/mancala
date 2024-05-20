@@ -57,7 +57,6 @@ public:
     void connsend(int);
     void timer(int);
     void playthedamngame();
-    void playgame2();
     void enbu();
     void dibu();
     void changen();

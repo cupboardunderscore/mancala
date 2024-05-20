@@ -14,11 +14,9 @@ Widget::Widget(QWidget *parent)
     if (!settings.exists())
     {
         bool semi = true;
-        QStringList tempo = QHostInfo::localHostName().split('.');
-        QStringList tempoo = tempo[0].split('-');
         while (semi == true)
         {
-            myname = QInputDialog::getText(this, "mancala.", "choose your name", QLineEdit::Normal, tempoo[0]);
+            myname = QInputDialog::getText(this, "mancala.", "choose your name\ncharacter \";\" is not allowed", QLineEdit::Normal, QDir::home().dirName());
             semi = false;
             if (myname.size() == 0)
             {
@@ -35,8 +33,7 @@ Widget::Widget(QWidget *parent)
         }
         settings.open(QIODevice::ReadWrite);
         QTextStream txtStream(&settings);
-        txtStream << myname;
-        txtStream << "\n0\nplsdonotchange:3";
+        txtStream << myname << "\n0\nplsdonotchange:3";
         settings.close();
     }
     settings.open(QIODevice::ReadWrite);
@@ -48,21 +45,21 @@ Widget::Widget(QWidget *parent)
     tempwins.setNum(wins);
     if (wins == 0)
     {
-        tempwins += " wins :c";
+        tempwins = "don't have any wins yet :c";
     }
     else if (wins == 1)
     {
-        tempwins += " win!";
+        tempwins = "have 1 win!";
     }
     else
     {
-        tempwins += " wins!";
+        tempwins = "have " + tempwins + " wins!";
     }
     changename.setText("change name");
     rules.setText("how to play");
     name.setText("mancala.");
     name.setStyleSheet("font-weight: bold");
-    usern.setText("welcome " + myname + "\nyou have " + tempwins);
+    usern.setText("welcome " + myname + "\nyou " + tempwins);
     sinb.setText("local game");
     mulb.setText("multiplayer");
     host.setText("host game");
@@ -853,12 +850,17 @@ void Widget::changen()
     QFile settings(setpath + "/settings");
     QString tempwins;
     tempwins.setNum(wins);
-    QStringList tempo = QHostInfo::localHostName().split('.');
-    QStringList tempoo = tempo[0].split('-');
     while (semi == true)
     {
-        myname = QInputDialog::getText(this, "mancala.", "choose your name", QLineEdit::Normal, tempoo[0]);
+        QString tempna = myname;
+        bool ok;
+        myname = QInputDialog::getText(this, "mancala.", "choose your name\ncharacter \";\" is not allowed", QLineEdit::Normal, QDir::home().dirName(), &ok);
         semi = false;
+        if (ok == false)
+        {
+            myname = tempna;
+            break;
+        }
         if (myname.size() == 0)
         {
             semi = true;
@@ -879,17 +881,17 @@ void Widget::changen()
     settings.close();
     if (wins == 0)
     {
-        tempwins += " wins :c";
+        tempwins = "don't have any wins yet :c";
     }
     else if (wins == 1)
     {
-        tempwins += " win!";
+        tempwins = "have 1 win!";
     }
     else
     {
-        tempwins += " wins!";
+        tempwins = "have " + tempwins + " wins!";
     }
-    usern.setText("welcome " + myname + "\nyou have " + tempwins);
+    usern.setText("welcome " + myname + "\nyou " + tempwins);
 }
 
 void Widget::win()

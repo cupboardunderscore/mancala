@@ -489,8 +489,7 @@ void Widget::hostgame()
             QHostAddress address;
             quint16 port;
             socket.readDatagram(datagram.data(), datagram.size(), &address, &port);
-            QHostAddress tempipp(address.toIPv4Address());
-            frenip = tempipp.toString();
+            frenaddress.setAddress(address.toIPv4Address());
             QString tempfren = datagram.data();
             QStringList tempfnre = tempfren.split(';');
             frenname = tempfnre[0];
@@ -503,8 +502,8 @@ void Widget::hostgame()
                 winsfren = -1;
             }
             socket.close();
-            ipwait.setText(frenname + " connected with ip: " + frenip);
-            qDebug() << datagram.data() << tempipp;
+            ipwait.setText(frenname + " connected with ip: " + frenaddress.toString());
+            qDebug() << datagram.data() << frenaddress.toString();
             host2();
             nono = true;
         }
@@ -516,7 +515,6 @@ void Widget::host2()
     QString tempwins;
     tempwins.setNum(wins);
     tempwins = myname + ";" + tempwins;
-    QHostAddress frenaddress(frenip);
     QByteArray datagram2 = tempwins.toUtf8();
     timer(1000);
     socket2.writeDatagram(datagram2.data(), datagram2.size(), frenaddress, 55556);
@@ -533,8 +531,7 @@ void Widget::host2()
         QHostAddress address;
         quint16 port;
         socket.readDatagram(datagram.data(), datagram.size(), &address, &port);
-        QHostAddress tempipp(address.toIPv4Address());
-        if (tempipp.toString() == frenip)
+        if (QHostAddress(address.toIPv4Address()) == frenaddress)
         {
             qDebug() << datagram.data();
             QString te = datagram.data();
@@ -565,18 +562,17 @@ void Widget::hostsend(int data)
 {
     QString temp;
     temp.setNum(data);
-    QHostAddress frenaddress(frenip);
     QByteArray datagram2 = temp.toUtf8();
     socket2.writeDatagram(datagram2.data(), datagram2.size(), frenaddress, 55556);
 }
 
 void Widget::conngame()
 {
-    frenip = QInputDialog::getText(this, "mancala.", "enter host ip:");
+    QString frenip = QInputDialog::getText(this, "mancala.", "enter host ip:");
     QString tempwins;
     tempwins.setNum(wins);
     tempwins = myname + ";" + tempwins;
-    QHostAddress frenaddress(frenip);
+    frenaddress.setAddress(frenip);
     QByteArray datagram2 = tempwins.toUtf8();
     socket.writeDatagram(datagram2.data(), datagram2.size(), frenaddress, 55555);
     if (!socket2.bind(55556, QUdpSocket::ShareAddress))
@@ -592,8 +588,7 @@ void Widget::conngame()
             QHostAddress address;
             quint16 port;
             socket2.readDatagram(datagram.data(), datagram.size(), &address, &port);
-            QHostAddress tempipp(address.toIPv4Address());
-            if (tempipp.toString() == frenip)
+            if (QHostAddress(address.toIPv4Address()) == frenaddress)
             {
                 QString tempfren = datagram.data();
                 QStringList tempfnre = tempfren.split(';');
@@ -607,9 +602,9 @@ void Widget::conngame()
                     winsfren = -1;
                 }
                 socket2.close();
-                ipwait.setText(frenname + " connected with ip: " + frenip);
+                ipwait.setText(frenname + " connected with ip: " + frenaddress.toString());
                 mainpage.addWidget(&ipwait);
-                qDebug() << datagram.data() << tempipp;
+                qDebug() << datagram.data() << frenaddress.toString();
                 conn2();
                 nono = true;
             }
@@ -621,7 +616,6 @@ void Widget::conn2()
 {
     playthedamngame();
     ipwait.hide();
-    QHostAddress frenaddress(frenip);
     if (!socket2.bind(55556, QUdpSocket::ShareAddress))
     {
         qDebug() << "Chyba pri inicializaci socketu";
@@ -633,8 +627,7 @@ void Widget::conn2()
         QHostAddress address;
         quint16 port;
         socket2.readDatagram(datagram.data(), datagram.size(), &address, &port);
-        QHostAddress tempipp(address.toIPv4Address());
-        if (tempipp.toString() == frenip)
+        if (QHostAddress(address.toIPv4Address()) == frenaddress)
         {
             qDebug() << datagram.data();
             QString te = datagram.data();
@@ -665,7 +658,6 @@ void Widget::connsend(int data)
 {
     QString temp;
     temp.setNum(data);
-    QHostAddress frenaddress(frenip);
     QByteArray datagram2 = temp.toUtf8();
     socket.writeDatagram(datagram2.data(), datagram2.size(), frenaddress, 55555);
 }

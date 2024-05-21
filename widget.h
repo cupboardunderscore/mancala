@@ -32,7 +32,8 @@ class Widget : public QWidget
     QVBoxLayout mainpage;
     QHBoxLayout mainh, mulh;
     QUdpSocket socket, socket2;
-    QString frenip, frenname;
+    QHostAddress frenaddress;
+    QString frenname;
     mancala mancl;
     QVBoxLayout mancccc;
     QHBoxLayout mancaladis, nameese;
